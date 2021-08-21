@@ -1,4 +1,4 @@
-export const USER_PROFILE_SET_TYPE = "USER_PROFILE_SET"
+export const UserProfileSetType = "USER_PROFILE_SET"
 
 export interface UserProfilePayload {
   id: string
@@ -15,7 +15,7 @@ export const UserProfileReducer = (
   action: UserProfileAction
 ): UserProfilePayload | null => {
   switch (action.type) {
-    case USER_PROFILE_SET_TYPE:
+    case UserProfileSetType:
       return action.payload;
     default:
       return state;

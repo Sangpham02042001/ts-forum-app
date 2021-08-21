@@ -4,7 +4,7 @@ import ReactModal from "react-modal";
 import ModalProps from "../types/ModalProps";
 import userReducer from "./common/UserReducer";
 import { allowSubmit } from "./common/Helpers";
-import { USER_PROFILE_SET_TYPE } from "../../store/user/Reducer";
+import { UserProfileSetType } from "../../store/user/Reducer";
 
 const Login: FC<ModalProps> = ({ isOpen, onClickToggle }) => {
   const [{ userName, password, resultMsg, isSubmitDisabled }, dispatch] =
@@ -18,7 +18,7 @@ const Login: FC<ModalProps> = ({ isOpen, onClickToggle }) => {
 
   useEffect(() => {
     reduxDispatch({
-      type: USER_PROFILE_SET_TYPE,
+      type: UserProfileSetType,
       payload: {
         id: 1,
         userName: "testUser",

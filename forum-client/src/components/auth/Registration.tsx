@@ -1,6 +1,6 @@
 import React, { FC, useReducer } from "react";
 import ReactModal from "react-modal";
-import "./Registraction.css";
+import "./Registration.css";
 import ModalProps from "../types/ModalProps";
 import userReducer from "./common/UserReducer";
 import { allowSubmit } from "./common/Helpers";

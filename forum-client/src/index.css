@@ -12,6 +12,15 @@ code {
     monospace;
 }
 
-ul {
+ul:not([data-slate-node="element"]) {
   list-style-type: none;
+}
+
+li {
+  margin-bottom: 1em;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  pointer-events: all !important;
 }

@@ -1,20 +1,21 @@
 import React, { useState } from "react";
-import { useWindowDimension } from "../../../hooks/useWindowDimensions";
-import ReactModal from "react-modal";
-import SideBarMenu from "../sidebar/SideBarMenu";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars } from "@fortawesome/free-solid-svg-icons";
 import "./Nav.css";
+import { useWindowDimension } from "../../../hooks/useWindowDimensions";
+import ReactModal from "react-modal";
+import SideBarMenus from "../sidebar/SideBarMenu";
 
-export default function Nav() {
-  const { width } = useWindowDimension();
+const Nav = () => {
   const [showMenu, setShowMenu] = useState(false);
+  const { width } = useWindowDimension();
+
   const getMobileMenu = () => {
     if (width <= 768) {
       return (
         <FontAwesomeIcon
-          icon={faBars}
           onClick={onClickToggle}
+          icon={faBars}
           size="lg"
           className="nav-mobile-menu"
         />
@@ -34,19 +35,21 @@ export default function Nav() {
   };
 
   return (
-    <>
+    <React.Fragment>
       <ReactModal
         className="modal-menu"
         isOpen={showMenu}
         onRequestClose={onRequestClose}
         shouldCloseOnOverlayClick={true}
       >
-        <SideBarMenu />
+        <SideBarMenus />
       </ReactModal>
       <nav>
         {getMobileMenu()}
         <strong>SuperForum</strong>
       </nav>
-    </>
+    </React.Fragment>
   );
-}
+};
+
+export default Nav;
