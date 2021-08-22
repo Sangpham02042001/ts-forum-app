@@ -2,8 +2,9 @@ import express from 'express';
 import Redis from 'ioredis';
 import session from 'express-session';
 import connectRedis from 'connect-redis';
-require("dotenv").config();
+import * as dotenv from 'dotenv';
 
+dotenv.config();
 console.log(process.env.NODE_ENV);
 const app = express();
 const router = express.Router();
@@ -54,9 +55,7 @@ router.get("/", (req, res, next) => {
 
 app.listen({
   port:
-    process.env.SERVER_PORT
+    process.env.PORT
 }, () => {
-  console.log(`Server ready on port
-  ${process.env.SERVER_PORT}`
-  );
+  console.log(`Server ready on port ${process.env.PORT}`);
 });
