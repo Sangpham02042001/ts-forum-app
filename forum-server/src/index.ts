@@ -22,6 +22,8 @@ const main = async () => {
     client: redis,
   });
 
+  app.use(express.json())
+
   app.use(
     session({
       store: redisStore,

@@ -2,11 +2,12 @@ import {
   Entity,
   PrimaryGeneratedColumn, Column, OneToMany
 } from 'typeorm';
+import { Auditable } from './Auditable';
 import { Thread } from './Thread';
 
 @Entity({ name: "TheadCategories" })
 
-export class ThreadCategory {
+export class ThreadCategory extends Auditable {
   @PrimaryGeneratedColumn({
     name: 'Id', type: 'bigint'
   })

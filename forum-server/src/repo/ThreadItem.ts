@@ -5,10 +5,11 @@ import {
 import { Length } from 'class-validator';
 import { Thread } from './Thread';
 import { ThreadItemPoint } from './ThreadItemPoints';
+import { Auditable } from './Auditable';
 
 @Entity({ name: "ThreadItems" })
 
-export class ThreadItem {
+export class ThreadItem extends Auditable {
   @PrimaryGeneratedColumn({
     name: 'Id', type: 'bigint'
   })
