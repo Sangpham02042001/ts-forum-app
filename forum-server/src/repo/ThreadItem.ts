@@ -4,6 +4,7 @@ import {
 } from 'typeorm';
 import { Length } from 'class-validator';
 import { Thread } from './Thread';
+import { User } from "./User";
 import { ThreadItemPoint } from './ThreadItemPoints';
 import { Auditable } from './Auditable';
 
@@ -40,6 +41,9 @@ export class ThreadItem extends Auditable {
 
   @ManyToOne(() => Thread, thread => thread.threadItems)
   thread: Thread;
+
+  @ManyToOne(() => User, (user) => user.threads)
+  user: User;
 
   @OneToMany(() => ThreadItemPoint, threadItemPoint => threadItemPoint.threadItem)
   threadItemPoints: ThreadItemPoint[]

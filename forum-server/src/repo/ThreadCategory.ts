@@ -5,7 +5,7 @@ import {
 import { Auditable } from './Auditable';
 import { Thread } from './Thread';
 
-@Entity({ name: "TheadCategories" })
+@Entity({ name: "ThreadCategories" })
 
 export class ThreadCategory extends Auditable {
   @PrimaryGeneratedColumn({
