@@ -14,7 +14,7 @@ export class Thread extends Auditable {
   @PrimaryGeneratedColumn({
     name: 'Id', type: 'bigint'
   })
-  id: String;
+  id: string;
 
   @Column("int", {
     name: 'Views',
@@ -22,6 +22,13 @@ export class Thread extends Auditable {
     nullable: false
   })
   views: number;
+
+  @Column("int", {
+    name: "Points",
+    default: 0,
+    nullable: false
+  })
+  points: number;
 
   @Column("boolean", {
     name: 'IsDisabled',

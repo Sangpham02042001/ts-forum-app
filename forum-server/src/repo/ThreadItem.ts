@@ -5,7 +5,7 @@ import {
 import { Length } from 'class-validator';
 import { Thread } from './Thread';
 import { User } from "./User";
-import { ThreadItemPoint } from './ThreadItemPoints';
+import { ThreadItemPoint } from './ThreadItemPoint';
 import { Auditable } from './Auditable';
 
 @Entity({ name: "ThreadItems" })
@@ -30,6 +30,13 @@ export class ThreadItem extends Auditable {
     nullable: false
   })
   isDisabled: boolean;
+
+  @Column("int", {
+    name: "Points",
+    default: 0,
+    nullable: false
+  })
+  points: number;
 
   @Column("varchar", {
     name: "Body"
