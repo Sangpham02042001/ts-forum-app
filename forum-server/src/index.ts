@@ -4,6 +4,9 @@ import session from 'express-session';
 import { createConnection } from "typeorm";
 import connectRedis from 'connect-redis';
 import * as dotenv from 'dotenv';
+import { ApolloServer, makeExecutableSchema } from 'apollo-server-express';
+import typeDefs from './gql/typeDefs';
+import resolvers from './gql/resolvers';
 import { login, register, logout } from './repo/UserRepo';
 import {
   createThread,
@@ -199,6 +202,16 @@ const main = async () => {
       res.send(ex.message);
     }
   });
+
+  const schema = makeExecutableSchema({ typeDefs, resolvers });
+  const apolloServer = new ApolloServer({
+    schema,
+    context: ({ req, res }: any) => ({ req, res })
+  })
+  apolloServer.applyMiddleware({
+    app,
+    cors: false
+  })
 
   app.listen({
     port:
