@@ -5,10 +5,15 @@ import "./UserProfile.css";
 import Nav from "../../areas/nav/Nav";
 import { useSelector } from "react-redux";
 import { AppState } from "../../../store/AppState";
-import { getUserThreads } from "../../../services/DataService";
 import Thread from "../../../models/Thread";
 import { Link } from "react-router-dom";
-import ThreadItem from "../../../models/ThreadItem";
+import { gql, useMutation } from "@apollo/client";
+
+const ChangePassword = gql`
+  mutation ChangePassword($newPassword: String!) {
+    changePassword(newPassword: $newPassword)
+  }
+`;
 
 const UserProfile = () => {
   const [
@@ -24,6 +29,7 @@ const UserProfile = () => {
   const user = useSelector((state: AppState) => state.user);
   const [threads, setThreads] = useState<JSX.Element | undefined>();
   const [threadItems, setThreadItems] = useState<JSX.Element | undefined>();
+  const [execChangePassword] = useMutation(ChangePassword);
 
   useEffect(() => {
     console.log("user", user);
@@ -33,34 +39,58 @@ const UserProfile = () => {
         payload: user.userName,
       });
 
-      getUserThreads(user.id).then((items) => {
-        const threadItemsInThreadList: Array<ThreadItem> = [];
-        const threadList = items.map((th: Thread) => {
-          for (let i = 0; i < th.threadItems.length; i++) {
-            threadItemsInThreadList.push(th.threadItems[i]);
-          }
-
-          return (
-            <li key={`user-th-${th.id}`}>
-              <Link to={`/thread/${th.id}`} className="userprofile-link">
-                {th.title}
-              </Link>
-            </li>
-          );
-        });
-        setThreads(<ul>{threadList}</ul>);
-
-        const threadItemList = threadItemsInThreadList.map((ti: ThreadItem) => (
-          <li key={`user-th-${ti.threadId}`}>
-            <Link to={`/thread/${ti.threadId}`} className="userprofile-link">
-              {ti.body}
+      const threadList = user.threads?.map((th: Thread) => {
+        return (
+          <li key={`user-th-${th.id}`}>
+            <Link to={`/thread/${th.id}`} className="userprofile-link">
+              {th.title}
             </Link>
           </li>
-        ));
-        setThreadItems(<ul>{threadItemList}</ul>);
+        );
       });
+      setThreads(
+        !user.threadItems || user.threadItems.length === 0 ? undefined : (
+          <ul>{threadList}</ul>
+        )
+      );
+
+      const threadItemList = user.threadItems?.map((ti: any) => (
+        <li key={`user-ti-${ti.id}`}>
+          <Link to={`/thread/${ti.thread?.id}`} className="userprofile-link">
+            {ti.body.length <= 40 ? ti.body : ti.body.substring(0, 40) + " ..."}
+          </Link>
+        </li>
+      ));
+      setThreadItems(
+        !user.threadItems || user.threadItems.length === 0 ? undefined : (
+          <ul>{threadItemList}</ul>
+        )
+      );
+    } else {
+      dispatch({
+        type: "userName",
+        payload: "",
+      });
+      setThreads(undefined);
+      setThreadItems(undefined);
     }
   }, [user]);
+
+  const onClickChangePassword = async (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    e.preventDefault();
+    const { data: changePasswordData } = await execChangePassword({
+      variables: {
+        newPassword: password,
+      },
+    });
+    dispatch({
+      type: "resultMsg",
+      payload: changePasswordData ? changePasswordData.changePassword : "",
+    });
+    console.log("changePasswordData", changePasswordData);
+  };
 
   return (
     <div className="screen-root-container">
@@ -79,7 +109,11 @@ const UserProfile = () => {
               password={password}
               passwordConfirm={passwordConfirm}
             />
-            <button className="action-btn" disabled={isSubmitDisabled}>
+            <button
+              className="action-btn"
+              disabled={isSubmitDisabled}
+              onClick={onClickChangePassword}
+            >
               Change Password
             </button>
           </div>
@@ -94,7 +128,7 @@ const UserProfile = () => {
             {threads}
           </div>
           <div className="userprofile-threadIems">
-            <strong>ThreadItems Posted</strong>
+            <strong>Responses Posted</strong>
             {threadItems}
           </div>
         </div>

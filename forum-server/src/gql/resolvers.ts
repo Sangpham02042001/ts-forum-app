@@ -1,30 +1,38 @@
 import { IResolvers } from "apollo-server-express";
+import CategoryThread from "../repo/CategoryThread";
+import { getTopCategoryThread } from "../repo/CategoryThreadRepo";
 import { QueryArrayResult, QueryOneResult } from "../repo/QueryArrayResult";
 import { Thread } from "../repo/Thread";
-import { User } from "../repo/User";
-import { ThreadItem } from '../repo/ThreadItem';
 import { ThreadCategory } from "../repo/ThreadCategory";
+import { getAllCategories } from "../repo/ThreadCategoryRepo";
+import { ThreadItem } from "../repo/ThreadItem";
+import { updateThreadItemPoint } from "../repo/ThreadItemPointRepo";
 import {
-  getThreadById, createThread,
-  getThreadsByCategoryId, getThreadsLatest
-} from "../repo/ThreadRepo";
+  createThreadItem,
+  getThreadItemsByThreadId,
+} from "../repo/ThreadItemRepo";
 import { updateThreadPoint } from "../repo/ThreadPointRepo";
-import { getThreadItemsByThreadId } from '../repo/ThreadItemRepo';
-import { getAllCategories } from '../repo/ThreadCategoryRepo';
 import {
-  register,
+  createThread,
+  getThreadById,
+  getThreadsByCategoryId,
+  getThreadsLatest,
+} from "../repo/ThreadRepo";
+import { User } from "../repo/User";
+import {
+  changePassword,
   login,
   logout,
   me,
-  UserResult
-} from '../repo/UserRepo';
-import { GqlContext } from './GqlContext'
+  register,
+  UserResult,
+} from "../repo/UserRepo";
+import { GqlContext } from "./GqlContext";
 
+const STANDARD_ERROR = "An error has occurred";
 interface EntityResult {
   messages: Array<string>;
 }
-const STANDARD_ERROR = "An error has occurred";
-
 const resolvers: IResolvers = {
   UserResult: {
     __resolveType(obj: any, context: GqlContext, info: any) {
@@ -66,7 +74,6 @@ const resolvers: IResolvers = {
       return "ThreadItemArray";
     },
   },
-
   Query: {
     getThreadById: async (
       obj: any,
@@ -77,14 +84,16 @@ const resolvers: IResolvers = {
       let thread: QueryOneResult<Thread>;
       try {
         thread = await getThreadById(args.id);
+
         if (thread.entity) {
           return thread.entity;
         }
         return {
-          messages: thread.messages ? thread.messages : []
-        }
-      } catch (error) {
-        throw error;
+          messages: thread.messages ? thread.messages : [STANDARD_ERROR],
+        };
+      } catch (ex) {
+        console.log(ex.message);
+        throw ex;
       }
     },
     getThreadsByCategoryId: async (
@@ -104,8 +113,8 @@ const resolvers: IResolvers = {
         return {
           messages: threads.messages ? threads.messages : [STANDARD_ERROR],
         };
-      } catch (error) {
-        throw error;
+      } catch (ex) {
+        throw ex;
       }
     },
     getThreadsLatest: async (
@@ -125,29 +134,8 @@ const resolvers: IResolvers = {
         return {
           messages: threads.messages ? threads.messages : [STANDARD_ERROR],
         };
-      } catch (error) {
-        throw error;
-      }
-    },
-    getAllCategories: async (
-      obj: any,
-      args: null,
-      ctx: GqlContext,
-      info: any
-    ): Promise<Array<ThreadCategory> | EntityResult> => {
-      let categories: QueryArrayResult<ThreadCategory>;
-      try {
-        categories = await getAllCategories();
-        if (categories.entities) {
-          return categories.entities;
-        }
-        return {
-          messages: categories.messages
-            ? categories.messages
-            : [STANDARD_ERROR],
-        };
-      } catch (error) {
-        throw error;
+      } catch (ex) {
+        throw ex;
       }
     },
     getThreadItemByThreadId: async (
@@ -169,8 +157,29 @@ const resolvers: IResolvers = {
             ? threadItems.messages
             : [STANDARD_ERROR],
         };
-      } catch (error) {
-        throw error;
+      } catch (ex) {
+        throw ex;
+      }
+    },
+    getAllCategories: async (
+      obj: any,
+      args: null,
+      ctx: GqlContext,
+      info: any
+    ): Promise<Array<ThreadCategory> | EntityResult> => {
+      let categories: QueryArrayResult<ThreadCategory>;
+      try {
+        categories = await getAllCategories();
+        if (categories.entities) {
+          return categories.entities;
+        }
+        return {
+          messages: categories.messages
+            ? categories.messages
+            : [STANDARD_ERROR],
+        };
+      } catch (ex) {
+        throw ex;
       }
     },
     me: async (
@@ -197,17 +206,24 @@ const resolvers: IResolvers = {
         throw ex;
       }
     },
+    getTopCategoryThread: async (
+      obj: any,
+      args: null,
+      ctx: GqlContext,
+      info: any
+    ): Promise<Array<CategoryThread>> => {
+      try {
+        return await getTopCategoryThread();
+      } catch (ex) {
+        console.log(ex.message);
+        throw ex;
+      }
+    },
   },
-
   Mutation: {
     createThread: async (
       obj: any,
-      args: {
-        userId: string;
-        categoryId: string;
-        title: string;
-        body: string
-      },
+      args: { userId: string; categoryId: string; title: string; body: string },
       ctx: GqlContext,
       info: any
     ): Promise<EntityResult> => {
@@ -218,22 +234,39 @@ const resolvers: IResolvers = {
           args.categoryId,
           args.title,
           args.body
-        )
+        );
         return {
-          messages: result.messages ? result.messages
-            : ['An error occurred']
-        }
-      } catch (error) {
-        throw error;
+          messages: result.messages ? result.messages : [STANDARD_ERROR],
+        };
+      } catch (ex) {
+        console.log(ex);
+        throw ex;
+      }
+    },
+    createThreadItem: async (
+      obj: any,
+      args: { userId: string; threadId: string; body: string },
+      ctx: GqlContext,
+      info: any
+    ): Promise<EntityResult> => {
+      let result: QueryOneResult<ThreadItem>;
+      try {
+        result = await createThreadItem(args.userId, args.threadId, args.body);
+        return {
+          messages: result.messages ? result.messages : [STANDARD_ERROR],
+        };
+      } catch (ex) {
+        console.log(ex);
+        throw ex;
       }
     },
     updateThreadPoint: async (
       obj: any,
-      args: { threadId: string, increment: boolean },
+      args: { threadId: string; increment: boolean },
       ctx: GqlContext,
       info: any
     ): Promise<string> => {
-      let result = ''
+      let result = "";
       try {
         if (!ctx.req.session || !ctx.req.session?.userId) {
           return "You must be logged in to set likes.";
@@ -244,8 +277,29 @@ const resolvers: IResolvers = {
           args.increment
         );
         return result;
-      } catch (error) {
-        throw error;
+      } catch (ex) {
+        throw ex;
+      }
+    },
+    updateThreadItemPoint: async (
+      obj: any,
+      args: { threadItemId: string; increment: boolean },
+      ctx: GqlContext,
+      info: any
+    ): Promise<string> => {
+      let result = "";
+      try {
+        if (!ctx.req.session || !ctx.req.session?.userId) {
+          return "You must be logged in to set likes.";
+        }
+        result = await updateThreadItemPoint(
+          ctx.req.session!.userId,
+          args.threadItemId,
+          args.increment
+        );
+        return result;
+      } catch (ex) {
+        throw ex;
       }
     },
     register: async (
@@ -261,8 +315,8 @@ const resolvers: IResolvers = {
           return "Registration successful.";
         }
         return user && user.messages ? user.messages[0] : STANDARD_ERROR;
-      } catch (error) {
-        throw error;
+      } catch (ex) {
+        throw ex;
       }
     },
     login: async (
@@ -305,7 +359,27 @@ const resolvers: IResolvers = {
         throw ex;
       }
     },
-  }
-}
+    changePassword: async (
+      obj: any,
+      args: { newPassword: string },
+      ctx: GqlContext,
+      info: any
+    ): Promise<string> => {
+      try {
+        if (!ctx.req.session || !ctx.req.session!.userId) {
+          return "You must be logged in before you can change your password.";
+        }
+        let result = await changePassword(
+          ctx.req.session!.userId,
+          args.newPassword
+        );
+
+        return result;
+      } catch (ex) {
+        throw ex;
+      }
+    },
+  },
+};
 
 export default resolvers;

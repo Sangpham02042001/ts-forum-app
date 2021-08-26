@@ -7,7 +7,7 @@ import UserProfile from "./components/routes/userProfile/UserProfile";
 import { useDispatch } from "react-redux";
 import { gql, useQuery } from "@apollo/client";
 import { ThreadCategoriesType } from "./store/categories/Reducer";
-// import useRefreshReduxMe from "./hooks/useRefreshReduxMe";
+import useRefreshReduxMe from "./hooks/useRefreshReduxMe";
 
 const GetAllCategories = gql`
   query getAllCategories {
@@ -20,16 +20,16 @@ const GetAllCategories = gql`
 
 function App() {
   const { data: categoriesData } = useQuery(GetAllCategories);
-  // const { execMe, updateMe } = useRefreshReduxMe();
+  const { execMe, updateMe } = useRefreshReduxMe();
   const dispatch = useDispatch();
 
-  // useEffect(() => {
-  //   execMe();
-  // }, [execMe]);
+  useEffect(() => {
+    execMe();
+  }, [execMe]);
 
-  // useEffect(() => {
-  //   updateMe();
-  // }, [updateMe]);
+  useEffect(() => {
+    updateMe();
+  }, [updateMe]);
 
   useEffect(() => {
     if (categoriesData && categoriesData.getAllCategories) {

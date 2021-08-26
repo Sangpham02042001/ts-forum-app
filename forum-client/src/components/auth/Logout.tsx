@@ -1,12 +1,40 @@
+import { gql, useMutation } from "@apollo/client";
 import React, { FC } from "react";
 import ReactModal from "react-modal";
+import { useSelector } from "react-redux";
+import { AppState } from "../../store/AppState";
 import ModalProps from "../types/ModalProps";
+import useRefreshReduxMe, { Me } from "../../hooks/useRefreshReduxMe";
 import "./Logout.css";
 
+const LogoutMutation = gql`
+  mutation logout($userName: String!) {
+    logout(userName: $userName)
+  }
+`;
+
 const Logout: FC<ModalProps> = ({ isOpen, onClickToggle }) => {
-  const onClickLogin = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  const user = useSelector((state: AppState) => state.user);
+  const [execLogout] = useMutation(LogoutMutation, {
+    refetchQueries: [
+      {
+        query: Me,
+      },
+    ],
+  });
+  const { deleteMe } = useRefreshReduxMe();
+
+  const onClickLogin = async (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
     e.preventDefault();
     onClickToggle(e);
+    await execLogout({
+      variables: {
+        userName: user?.userName ?? "",
+      },
+    });
+    deleteMe();
   };
 
   const onClickCancel = (
