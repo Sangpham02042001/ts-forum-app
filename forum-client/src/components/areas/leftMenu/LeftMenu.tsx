@@ -1,28 +1,36 @@
 import React, { useEffect, useState } from "react";
 import { useWindowDimension } from "../../../hooks/useWindowDimensions";
-import { getCategories } from "../../../services/DataService";
-import Category from "../../../models/Category";
 import "./LeftMenu.css";
+import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { AppState } from "../../../store/AppState";
+import Category from "../../../models/Category";
 
-export default function LeftMenu() {
+const LeftMenu = () => {
+  const categoriesState = useSelector((state: AppState) => state.categories);
   const { width } = useWindowDimension();
   const [categories, setCategories] = useState<JSX.Element>(
     <div>Left Menu</div>
   );
 
   useEffect(() => {
-    getCategories()
-      .then((categories: Array<Category>) => {
-        const cats = categories.map((cat) => {
-          return <li key={cat.id}>{cat.name}</li>;
-        });
-        setCategories(<ul className="category">{cats}</ul>);
-      })
-      .catch((err) => console.log(err));
-  }, []);
+    if (categoriesState) {
+      console.log(categoriesState);
+      const cats = categoriesState.map((cat: Category) => {
+        return (
+          <li key={cat.id}>
+            <Link to={`/categorythreads/${cat.id}`}>{cat.name}</Link>
+          </li>
+        );
+      });
+      setCategories(<ul className="category">{cats}</ul>);
+    }
+  }, [categoriesState]);
 
   if (width <= 768) {
     return null;
   }
   return <div className="leftmenu">{categories}</div>;
-}
+};
+
+export default LeftMenu;

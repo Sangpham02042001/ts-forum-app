@@ -1,18 +1,33 @@
 import React, { FC } from "react";
+import { useWindowDimension } from "../../../hooks/useWindowDimensions";
 import Category from "../../../models/Category";
+import CategoryDropDown from "../../CategoryDropdown";
+import "./MainHeader.css";
 
-interface MainHeaderProp {
+interface MainHeaderProps {
   category?: Category;
 }
 
-const MainHeader: FC<MainHeaderProp> = ({ category }) => {
+const MainHeader: FC<MainHeaderProps> = ({ category }) => {
+  const { width } = useWindowDimension();
+
+  const getLabelElement = () => {
+    if (width <= 768) {
+      return (
+        <CategoryDropDown navigate={true} preselectedCategory={category} />
+      );
+    } else {
+      return <strong>{category?.name || "Placeholder"}</strong>;
+    }
+  };
+
   return (
     <div className="main-header">
       <div
         className="title-bar"
-        style={{ marginBottom: ".25em", paddingBottom: 0 }}
+        style={{ marginBottom: ".25em", paddingBottom: "0" }}
       >
-        <strong>{category?.name || "Placeholder"}</strong>
+        {getLabelElement()}
       </div>
     </div>
   );

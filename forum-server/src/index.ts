@@ -3,6 +3,7 @@ import Redis from 'ioredis';
 import session from 'express-session';
 import { createConnection } from "typeorm";
 import connectRedis from 'connect-redis';
+import cors from 'cors';
 import * as dotenv from 'dotenv';
 import { ApolloServer, makeExecutableSchema } from 'apollo-server-express';
 import typeDefs from './gql/typeDefs';
@@ -54,6 +55,14 @@ const main = async () => {
       userid: '',
       loadedCount: 0
     } as any)
+  );
+
+  app.use(
+    cors({
+      credentials: true,
+      origin:
+        process.env.CLIENT_URL,
+    })
   );
 
   app.use(router);
