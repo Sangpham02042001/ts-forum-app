@@ -4,10 +4,14 @@ import ThreadResponse from "./ThreadResponse";
 
 interface ThreadResponsesBuilderProps {
   threadItems?: Array<ThreadItem>;
+  readOnly: boolean;
+  refreshThread?: () => void;
 }
 
 const ThreadResponsesBuilder: FC<ThreadResponsesBuilderProps> = ({
   threadItems,
+  readOnly,
+  refreshThread,
 }) => {
   const [responseElements, setResponseElements] = useState<
     JSX.Element | undefined
@@ -20,16 +24,21 @@ const ThreadResponsesBuilder: FC<ThreadResponsesBuilderProps> = ({
           <li key={`thr-${ti.id}`}>
             <ThreadResponse
               body={ti.body}
-              userName={ti.userName}
+              userName={ti.user.userName}
               lastModifiedOn={ti.createdOn}
               points={ti.points}
+              readOnly={readOnly}
+              threadItemId={ti?.id || "0"}
+              threadId={ti.thread.id}
+              refreshThread={refreshThread}
             />
           </li>
         );
       });
       setResponseElements(<ul>{thResponses}</ul>);
     }
-  }, [threadItems]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [threadItems, readOnly]);
 
   return (
     <div className="thread-body-container">

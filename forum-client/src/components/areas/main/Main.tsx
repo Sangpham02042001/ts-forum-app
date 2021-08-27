@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import MainHeader from "./MainHeader";
-import { useParams, useHistory } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 import ThreadCard from "./ThreadCard";
 import Category from "../../../models/Category";
 import { gql, useLazyQuery } from "@apollo/client";
@@ -33,7 +33,6 @@ const GetThreadsByCategoryId = gql`
     }
   }
 `;
-
 const GetThreadsLatest = gql`
   query getThreadsLatest {
     getThreadsLatest {
@@ -80,12 +79,12 @@ const Main = () => {
       data: threadsLatestData,
     },
   ] = useLazyQuery(GetThreadsLatest);
-  const history = useHistory();
   const { categoryId } = useParams<{ categoryId: string }>();
   const [category, setCategory] = useState<Category | undefined>();
   const [threadCards, setThreadCards] = useState<Array<JSX.Element> | null>(
     null
   );
+  const history = useHistory();
 
   useEffect(() => {
     if (categoryId && Number(categoryId) > 0) {
@@ -97,6 +96,7 @@ const Main = () => {
     } else {
       execGetThreadsLatest();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [categoryId]);
 
   useEffect(() => {

@@ -1,24 +1,61 @@
 import React, { FC } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHeart, faReplyAll } from "@fortawesome/free-solid-svg-icons";
+import {
+  faHeart,
+  faReplyAll,
+  faChevronDown,
+  faChevronUp,
+} from "@fortawesome/free-solid-svg-icons";
 import { useWindowDimension } from "../../hooks/useWindowDimensions";
+import useUpdateThreadPoint from "../../hooks/useUpdateThreadPoint";
 
-export interface ThreadPointsBarProps {
-  points: number;
+export class ThreadPointsBarProps {
+  points: number = 0;
   responseCount?: number;
+  threadId?: string;
+  allowUpdatePoints?: boolean = false;
+  refreshThread?: () => void;
 }
 
 const ThreadPointsBar: FC<ThreadPointsBarProps> = ({
   points,
   responseCount,
+  threadId,
+  allowUpdatePoints,
+  refreshThread,
 }) => {
   const { width } = useWindowDimension();
+  const { onClickDecThreadPoint, onClickIncThreadPoint } = useUpdateThreadPoint(
+    refreshThread,
+    threadId
+  );
+
   if (width > 768) {
+    console.log("ThreadPointsBar points", points);
     return (
       <div className="threadcard-points">
         <div className="threadcard-points-item">
+          <div
+            className="threadcard-points-item-btn"
+            style={{ display: `${allowUpdatePoints ? "block" : "none"}` }}
+          >
+            <FontAwesomeIcon
+              icon={faChevronUp}
+              className="point-icon"
+              onClick={onClickIncThreadPoint}
+            />
+          </div>
           {points}
-          <br />
+          <div
+            className="threadcard-points-item-btn"
+            style={{ display: `${allowUpdatePoints ? "block" : "none"}` }}
+          >
+            <FontAwesomeIcon
+              icon={faChevronDown}
+              className="point-icon"
+              onClick={onClickDecThreadPoint}
+            />
+          </div>
           <FontAwesomeIcon icon={faHeart} className="points-icon" />
         </div>
         <div className="threadcard-points-item">

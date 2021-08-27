@@ -1,7 +1,7 @@
 import React, { FC } from "react";
 import { useWindowDimension } from "../../../hooks/useWindowDimensions";
 import Category from "../../../models/Category";
-import CategoryDropDown from "../../CategoryDropdown";
+import CategoryDropDown from "../../CategoryDropDown";
 import "./MainHeader.css";
 
 interface MainHeaderProps {

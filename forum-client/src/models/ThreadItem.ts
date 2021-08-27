@@ -1,4 +1,5 @@
 import Thread from "./Thread";
+import User from "./User";
 
 export default class ThreadItem {
   constructor(
@@ -6,9 +7,8 @@ export default class ThreadItem {
     public views: number,
     public points: number,
     public body: string,
-    public userName: string,
-    public userId: string,
+    public user: User,
     public createdOn: Date,
-    public threadId: string
+    public thread: Thread
   ) { }
 }
